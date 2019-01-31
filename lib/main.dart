@@ -41,11 +41,23 @@ class RandomWordsState extends State<RandomWords>{
          builder: (BuildContext context){
            final Iterable<ListTile> titles = _saved.map(
              (WordPair pair){
+               final savedData = _saved.contains(pair);
                return new ListTile(
                  title: new Text(
                    pair.asPascalCase,
                    style: _biggerFont,
                  ),
+                 trailing: new Icon(
+                   savedData ? Icons.favorite : Icons.favorite_border,
+                   color:  savedData ? Colors.yellow : null,
+                 ),
+                 onTap: (){
+                   setState(() {
+                    if(_saved.contains(pair)){
+                      _saved.remove(pair);
+                   } 
+                   });
+                 },
                );
              },
            );
