@@ -1,92 +1,110 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      theme: new ThemeData(
-        primaryColor: Colors.green,
-      ),
-      home: Counter(),
-    );
-  }
+void main() {
+  runApp(MaterialApp(
+    title: 'Shopping App',
+    theme: new ThemeData(
+      primaryColor: Colors.green,
+    ),
+    home: ShoppingList(
+      products: <Product>[
+        Product(name: 'Eggs'),
+        Product(name: 'Flour'),
+        Product(name: 'Chocolate chips'),
+      ],
+    ),
+  ));
 }
 
-class MyButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        print('MyButton was tapped!');
-      },
-      child: Container(
-        height: 36.0,
-        padding: const EdgeInsets.all(8.0),
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5.0),
-          color: Colors.lightGreen[500],
-        ),
-        child: Center(
-          child: Text('Engage'),
-        ),
-      ),
-    );
-  }
+class Product {
+  const Product({this.name});
+  final String name;
 }
 
-class CountInteruption extends StatelessWidget{
-  CountInteruption({this.onPressed});
-  final VoidCallback onPressed;
+typedef CarChangedCallback(Product prd,bool inCart);
+
+class ShoppingListItem extends StatelessWidget{
+  
+  ShoppingListItem({Product product, this.isCart, this.onCarChanged})
+      : product = product,
+        super(key: ObjectKey(product));
+  final bool isCart;
+  final CarChangedCallback onCarChanged;
+  final Product product;
+
+  Color _getColor(BuildContext context){
+    return isCart ? Colors.black54 : Theme.of(context).primaryColor;
+  }
+
+  TextStyle _getTextStyle(BuildContext context){
+    if(!isCart) return null;
+    
+    return TextStyle(
+      color: Colors.black54,
+      decoration: TextDecoration.lineThrough,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return RaisedButton(
-      onPressed: onPressed,
-      child: Text('Increment'),
+    return ListTile(
+       onTap: (){
+         onCarChanged(product,!isCart);
+       },
+       leading: CircleAvatar(
+         backgroundColor: _getColor(context),
+         child: Text(product.name[0]),
+       ),
+       title: Text(
+         product.name[0],
+         style: _getTextStyle(context),
+         ),
     );
   }
 
 }
 
-class _CounterState extends State<Counter>{
-   int _count = 0;
-   
-   void _increment(){
-     setState(() {
-        ++_count;
-     });
+
+class ShoppingList extends StatefulWidget{
+  ShoppingList({this.products,Key key}) : super(key:key);
+  final List<Product> products;
+  
+  @override
+  State<StatefulWidget> createState() => _ShoppingState();
+}
+
+class _ShoppingState extends State<ShoppingList>{
+   Set<Product> productions = Set<Product>();
+
+   void _handleShopCartEvent(Product product,bool isInCar){
+      setState(() {
+         if(isInCar) 
+          productions.add(product);
+        else 
+          productions.remove(product); 
+      });
    }
 
    @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Row(
-      children: <Widget>[
-       CountInteruption(onPressed: _increment),
-       ShowCount(count: _count),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Shopping list'),
+      ),
+      body: ListView(
+        padding: EdgeInsets.symmetric(),
+        children: widget.products.map((Product product){
+          return ShoppingListItem(
+            product: product,
+            isCart: productions.contains(product),
+            onCarChanged: _handleShopCartEvent,
+          ) ;
+        }).toList(),
+      ),
     );
-  }
-}
-
-class Counter extends StatefulWidget{
-  @override
-  State<StatefulWidget> createState() => _CounterState();
-}
-
-class ShowCount extends StatelessWidget{
-  ShowCount({this.count});
-  final int count;
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Text(' count : $count');
   }
 
 }
