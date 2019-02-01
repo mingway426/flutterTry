@@ -11,112 +11,82 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.green,
       ),
-      home: RandomWords(),
+      home: Counter(),
     );
   }
 }
 
-class RandomWordsState extends State<RandomWords>{
-   final _suggestions = <WordPair>[];
-   final _biggerFont = const TextStyle(fontSize: 18);
-   final Set<WordPair> _saved = new Set<WordPair>();
+class MyButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        print('MyButton was tapped!');
+      },
+      child: Container(
+        height: 36.0,
+        padding: const EdgeInsets.all(8.0),
+        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5.0),
+          color: Colors.lightGreen[500],
+        ),
+        child: Center(
+          child: Text('Engage'),
+        ),
+      ),
+    );
+  }
+}
+
+class CountInteruption extends StatelessWidget{
+  CountInteruption({this.onPressed});
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return RaisedButton(
+      onPressed: onPressed,
+      child: Text('Increment'),
+    );
+  }
+
+}
+
+class _CounterState extends State<Counter>{
+   int _count = 0;
    
+   void _increment(){
+     setState(() {
+        ++_count;
+     });
+   }
+
    @override
   Widget build(BuildContext context) {
-
-   return Scaffold(
-     appBar: AppBar(
-       title: Text("this is app bar"),
-        actions: <Widget>[
-       new IconButton(icon: const Icon(Icons.list),onPressed: _pushSaved),
-     ],
-     ),
-     body: _buildSuggestions(),
-   );
-  }
-
-  void _pushSaved(){
-    Navigator.of(context).push(
-       new MaterialPageRoute<void>(
-         builder: (BuildContext context){
-           final Iterable<ListTile> titles = _saved.map(
-             (WordPair pair){
-               final savedData = _saved.contains(pair);
-               return new ListTile(
-                 title: new Text(
-                   pair.asPascalCase,
-                   style: _biggerFont,
-                 ),
-                 trailing: new Icon(
-                   savedData ? Icons.favorite : Icons.favorite_border,
-                   color:  savedData ? Colors.yellow : null,
-                 ),
-                 onTap: (){
-                   setState(() {
-                    if(_saved.contains(pair)){
-                      _saved.remove(pair);
-                   } 
-                   });
-                 },
-               );
-             },
-           );
-           final List<Widget> divided = ListTile
-           .divideTiles(
-             context: context,
-             tiles: titles,
-           ).toList();
-
-           return new Scaffold(
-             appBar: new AppBar(
-               title: const Text("this is saved Suggestions"),
-             ),
-             body: new ListView(children: divided),
-           );
-         },
-       ),
-    );
-  }
-
-  Widget _buildSuggestions(){
-    return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemBuilder: (context,i){
-         if(i.isOdd) return Divider();
-
-         final index = i ~/ 2 ;
-         if(index >= _suggestions.length){
-           _suggestions.addAll(generateWordPairs().take(10));
-         }
-         return _buildRow(_suggestions[index]);
-      });
-  }
-
-  Widget _buildRow(WordPair pair){
-    final bool alreadySaved = _saved.contains(pair);
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-      trailing: new Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null
-      ),
-      onTap: (){
-        setState(() {
-         if(alreadySaved){
-           _saved.remove(pair);
-         } else {
-           _saved.add(pair);
-         }
-        });
-      },
+    // TODO: implement build
+    return Row(
+      children: <Widget>[
+       CountInteruption(onPressed: _increment),
+       ShowCount(count: _count),
+      ],
     );
   }
 }
 
-class RandomWords extends StatefulWidget{
+class Counter extends StatefulWidget{
   @override
-  RandomWordsState createState() => new RandomWordsState();
+  State<StatefulWidget> createState() => _CounterState();
+}
+
+class ShowCount extends StatelessWidget{
+  ShowCount({this.count});
+  final int count;
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Text(' count : $count');
+  }
+
 }
