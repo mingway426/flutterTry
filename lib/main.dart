@@ -3,108 +3,71 @@ import 'package:english_words/english_words.dart';
 
 void main() {
   runApp(MaterialApp(
-    title: 'Shopping App',
+    title: 'Test Animation',
     theme: new ThemeData(
       primaryColor: Colors.green,
     ),
-    home: ShoppingList(
-      products: <Product>[
-        Product(name: 'Eggs'),
-        Product(name: 'Flour'),
-        Product(name: 'Chocolate chips'),
-      ],
-    ),
+    home: AnimationTest(
+       
+    )
   ));
 }
 
-class Product {
-  const Product({this.name});
-  final String name;
-}
-
-typedef CarChangedCallback(Product prd,bool inCart);
-
-class ShoppingListItem extends StatelessWidget{
-  
-  ShoppingListItem({Product product, this.isCart, this.onCarChanged})
-      : product = product,
-        super(key: ObjectKey(product));
-  final bool isCart;
-  final CarChangedCallback onCarChanged;
-  final Product product;
-
-  Color _getColor(BuildContext context){
-    return isCart ? Colors.black54 : Theme.of(context).primaryColor;
-  }
-
-  TextStyle _getTextStyle(BuildContext context){
-    if(!isCart) return null;
-    
-    return TextStyle(
-      color: Colors.black54,
-      decoration: TextDecoration.lineThrough,
-    );
-  }
+class AnimationTest extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return ListTile(
-       onTap: (){
-         onCarChanged(product,!isCart);
-       },
-       leading: CircleAvatar(
-         backgroundColor: _getColor(context),
-         child: Text(product.name[0]),
-       ),
-       title: Text(
-         product.name[0],
-         style: _getTextStyle(context),
-         ),
+    return MaterialApp(
+      title: 'Test of Animation',
+      theme: new ThemeData(
+        primarySwatch: Colors.green,
+      ),
+      home: AnimationStateW(),
     );
   }
-
 }
 
-
-class ShoppingList extends StatefulWidget{
-  ShoppingList({this.products,Key key}) : super(key:key);
-  final List<Product> products;
-  
+class AnimationTestState extends State<AnimationStateW> with TickerProviderStateMixin{
+  AnimationController controller;
+  CurvedAnimation curve;
   @override
-  State<StatefulWidget> createState() => _ShoppingState();
-}
-
-class _ShoppingState extends State<ShoppingList>{
-   Set<Product> productions = Set<Product>();
-
-   void _handleShopCartEvent(Product product,bool isInCar){
-      setState(() {
-         if(isInCar) 
-          productions.add(product);
-        else 
-          productions.remove(product); 
-      });
-   }
-
-   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    controller = AnimationController(duration: const Duration(milliseconds: 2000),vsync: this);
+    curve = CurvedAnimation(parent: controller,curve: Curves.ease);
+  }
+@override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shopping list'),
+        title: Text('state title'),
       ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(),
-        children: widget.products.map((Product product){
-          return ShoppingListItem(
-            product: product,
-            isCart: productions.contains(product),
-            onCarChanged: _handleShopCartEvent,
-          ) ;
-        }).toList(),
-      ),
+      body: Center(
+        child: Container(
+          child: FadeTransition(
+            opacity: curve,
+            child: FlutterLogo(
+              size: 95,
+          )))),
+          floatingActionButton: FloatingActionButton(
+            tooltip: 'fade',
+            child: Icon(Icons.brush),
+            onPressed: (){
+              controller.forward();
+            },
+          ),
     );
   }
 
+}
+
+class AnimationStateW extends StatefulWidget{
+    @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return AnimationTestState();
+  }
 }
